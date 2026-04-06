@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hệ thống Chấm điểm Tín dụng | Sacombank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #1e3a5f;
+      --accent: #e63946;
+      --success: #2dc87a;
+      --warning: #f4a261;
+      --danger: #e63946;
+      --bg: #f0f4f8;
+      --card: #ffffff;
+      --text: #1a202c;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --shadow: 0 4px 24px rgba(30,58,95,0.08);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      height: 68px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 16px rgba(30,58,95,0.25);
+    }
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: #fff;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon svg { width: 24px; height: 24px; color: #1e3a5f; }
+    header h1 { color: #fff; font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; }
+    header span { color: rgba(255,255,255,0.65); font-size: 0.8rem; font-weight: 400; margin-left: 8px; }
+
+    /* ── LAYOUT ── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    .page-intro { margin-bottom: 36px; }
+    .page-intro h2 { font-size: 1.75rem; font-weight: 700; color: var(--primary); }
+    .page-intro p  { color: var(--muted); margin-top: 6px; font-size: 0.95rem; }
+
+    /* ── FORM GRID ── */
+    .form-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 36px;
+    }
+
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 10px;
+      margin-bottom: 24px;
+      margin-top: 32px;
+    }
+    .section-title:first-of-type { margin-top: 0; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #334155;
+    }
+    .field label .req { color: var(--accent); margin-left: 2px; }
+
+    .field input,
+    .field select {
+      height: 44px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 0 14px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      color: var(--text);
+      background: #f8fafc;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .field input:focus,
+    .field select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+      background: #fff;
+    }
+    .field input.error,
+    .field select.error { border-color: var(--danger); }
+
+    .field-hint { font-size: 0.75rem; color: var(--muted); }
+
+    /* ── SUBMIT ── */
+    .actions { margin-top: 36px; display: flex; gap: 14px; align-items: center; }
+
+    .btn-primary {
+      height: 50px;
+      padding: 0 36px;
+      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .btn-secondary {
+      height: 50px;
+      padding: 0 24px;
+      background: var(--border);
+      color: var(--muted);
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-secondary:hover { background: #cbd5e1; color: #334155; }
+
+    /* ── LOADING ── */
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2.5px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── RESULT PANEL ── */
+    #result { margin-top: 36px; }
+
+    .result-card {
+      border-radius: var(--radius);
+      padding: 32px;
+      animation: fadeIn 0.4s ease;
+    }
+    .result-card.approved  { background: linear-gradient(135deg, #e8fdf0 0%, #d1fae5 100%); border: 1.5px solid #6ee7b7; }
+    .result-card.rejected  { background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); border: 1.5px solid #fca5a5; }
+
+    @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+
+    .result-header { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+    .result-badge {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .result-badge.ok  { background: var(--success); color: #fff; }
+    .result-badge.no  { background: var(--danger);  color: #fff; }
+
+    .result-header h3 { font-size: 1.4rem; font-weight: 800; }
+    .approved .result-header h3 { color: #065f46; }
+    .rejected .result-header h3 { color: #9b1c1c; }
+    .result-header p { font-size: 0.88rem; color: var(--muted); margin-top: 4px; }
+
+    .metrics { display: flex; flex-wrap: wrap; gap: 16px; }
+    .metric-box {
+      flex: 1 1 160px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .metric-box .label { font-size: 0.78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .metric-box .value { font-size: 1.75rem; font-weight: 800; margin-top: 6px; color: var(--primary); }
+    .metric-box .sub   { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+
+    /* Score gauge */
+    .gauge-wrap { display: flex; justify-content: center; margin: 8px 0 4px; }
+    .score-bar { width: 100%; height: 8px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+    .score-fill { height: 100%; border-radius: 99px; transition: width 1s ease; }
+
+    .score-good    { background: linear-gradient(90deg, #34d399, #10b981); }
+    .score-medium  { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+    .score-low     { background: linear-gradient(90deg, #f87171, #ef4444); }
+
+    /* Error */
+    .error-msg {
+      background: #fff1f2;
+      border: 1.5px solid #fca5a5;
+      border-radius: 12px;
+      padding: 16px 20px;
+      color: #9b1c1c;
+      font-size: 0.9rem;
+      display: flex; align-items: center; gap: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+    </svg>
+  </div>
+  <h1>Hệ thống Chấm điểm Tín dụng<span>AI Credit Scoring</span></h1>
+</header>
+
+<div class="page">
+  <div class="page-intro">
+    <h2>Đánh giá hồ sơ vay tín dụng</h2>
+    <p>Nhập thông tin khách hàng để nhận kết quả xét duyệt, điểm tín dụng và hạn mức tối đa từ mô hình AI.</p>
+  </div>
+
+  <div class="form-card">
+    <form id="creditForm" novalidate>
+
+      <!-- THÔNG TIN CÁ NHÂN -->
+      <div class="section-title">Thông tin cá nhân</div>
+      <div class="grid">
+        <div class="field">
+          <label>Tuổi <span class="req">*</span></label>
+          <input type="number" id="tuoi" name="Tuổi" min="18" max="80" placeholder="VD: 30" />
+          <span class="field-hint">18 – 80 tuổi</span>
+        </div>
+        <div class="field">
+          <label>Tình trạng hôn nhân <span class="req">*</span></label>
+          <select id="honNhan" name="Tình trạng hôn nhân">
+            <option value="">-- Chọn --</option>
+            <option value="Không">Độc thân</option>
+            <option value="Có">Đã kết hôn</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Số người phụ thuộc <span class="req">*</span></label>
+          <input type="number" id="phuThuoc" name="Số người phụ thuộc" min="0" max="20" placeholder="VD: 2" />
+        </div>
+        <div class="field">
+          <label>Trình độ học vấn <span class="req">*</span></label>
+          <select id="hocVan" name="Trình độ học vấn">
+            <option value="">-- Chọn --</option>
+            <option value="Khác">Khác / THPT</option>
+            <option value="Cao đẳng">Cao đẳng</option>
+            <option value="Đại học">Đại học</option>
+            <option value="Sau đại học">Sau đại học</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- TÀI CHÍNH -->
+      <div class="section-title">Thông tin tài chính</div>
+      <div class="grid">
+        <div class="field">
+          <label>Thu nhập hàng tháng (VNĐ) <span class="req">*</span></label>
+          <input type="number" id="thuNhap" name="Thu nhập" min="0" placeholder="VD: 15000000" />
+        </div>
+        <div class="field">
+          <label>Chi phí hàng tháng (VNĐ) <span class="req">*</span></label>
+          <input type="number" id="chiPhi" name="Chi phí hàng tháng" min="0" placeholder="VD: 5000000" />
+        </div>
+        <div class="field">
+          <label>Điểm CIC <span class="req">*</span></label>
+          <input type="number" id="diemCIC" name="Điểm CIC" min="0" max="1000" placeholder="VD: 700" />
+          <span class="field-hint">0 – 1000 điểm</span>
+        </div>
+        <div class="field">
+          <label>Hình thức nhận lương <span class="req">*</span></label>
+          <select id="luong" name="Hình thức nhận lương">
+            <option value="">-- Chọn --</option>
+            <option value="Tiền mặt">Tiền mặt</option>
+            <option value="Nhận lương qua NH khác">Nhận lương qua NH khác</option>
+            <option value="Nhận lương qua Sacombank">Nhận lương qua Sacombank</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- CÔNG VIỆC & NHÀ Ở -->
+      <div class="section-title">Công việc & Sinh hoạt</div>
+      <div class="grid">
+        <div class="field">
+          <label>Vị trí công việc <span class="req">*</span></label>
+          <select id="viTri" name="Vị trí công việc">
+            <option value="">-- Chọn --</option>
+            <option value="KD tự do">Kinh doanh tự do</option>
+            <option value="Nhân viên">Nhân viên</option>
+            <option value="Quản lý">Quản lý</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Thời gian lao động (năm) <span class="req">*</span></label>
+          <input type="number" id="tgLaoDong" name="Thời gian lao động" min="0" placeholder="VD: 5" />
+        </div>
+        <div class="field">
+          <label>Thời gian làm tại nơi hiện tại (năm) <span class="req">*</span></label>
+          <input type="number" id="tgNW" name="Thời gian làm việc tại nơi LV hiện tại" min="0" placeholder="VD: 3" />
+        </div>
+        <div class="field">
+          <label>Tình trạng nhà ở hiện tại <span class="req">*</span></label>
+          <select id="nhaO" name="Tình trạng nhà ở hiện tại">
+            <option value="">-- Chọn --</option>
+            <option value="Thuê nhà">Thuê nhà</option>
+            <option value="Nhà trả góp">Nhà trả góp</option>
+            <option value="Sở hữu nhà ở">Sở hữu nhà ở</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="actions">
+        <button type="submit" class="btn-primary" id="submitBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Phân tích hồ sơ
+        </button>
+        <button type="button" class="btn-secondary" onclick="resetForm()">Nhập lại</button>
+      </div>
+    </form>
+
+    <!-- KẾT QUẢ -->
+    <div id="result"></div>
+  </div>
+</div>
+
+<script>
+  // ── Prefill demo ──
+  const demo = {
+    tuoi: 25, phuThuoc: 0, thuNhap: 15000000,
+    chiPhi: 5000000, diemCIC: 700, tgLaoDong: 3, tgNW: 2
+  };
+  Object.keys(demo).forEach(k => {
+    const el = document.getElementById(k);
+    if (el) el.value = demo[k];
+  });
+  document.getElementById('honNhan').value = 'Không';
+  document.getElementById('hocVan').value  = 'Đại học';
+  document.getElementById('viTri').value   = 'Nhân viên';
+  document.getElementById('nhaO').value    = 'Thuê nhà';
+  document.getElementById('luong').value   = 'Nhận lương qua NH khác';
+
+  // ── Submit ──
+  document.getElementById('creditForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const resultEl = document.getElementById('result');
+
+    // Gather data
+    const data = {
+      'Tuổi':                                    Number(document.querySelector('[name="Tuổi"]').value),
+      'Tình trạng hôn nhân':                     document.querySelector('[name="Tình trạng hôn nhân"]').value,
+      'Số người phụ thuộc':                      Number(document.querySelector('[name="Số người phụ thuộc"]').value),
+      'Thu nhập':                                Number(document.querySelector('[name="Thu nhập"]').value),
+      'Điểm CIC':                                Number(document.querySelector('[name="Điểm CIC"]').value),
+      'Chi phí hàng tháng':                      Number(document.querySelector('[name="Chi phí hàng tháng"]').value),
+      'Trình độ học vấn':                        document.querySelector('[name="Trình độ học vấn"]').value,
+      'Thời gian lao động':                      Number(document.querySelector('[name="Thời gian lao động"]').value),
+      'Vị trí công việc':                        document.querySelector('[name="Vị trí công việc"]').value,
+      'Thời gian làm việc tại nơi LV hiện tại':  Number(document.querySelector('[name="Thời gian làm việc tại nơi LV hiện tại"]').value),
+      'Tình trạng nhà ở hiện tại':               document.querySelector('[name="Tình trạng nhà ở hiện tại"]').value,
+      'Hình thức nhận lương':                    document.querySelector('[name="Hình thức nhận lương"]').value,
+    };
+
+    // Simple validation
+    const missing = Object.entries(data).filter(([k,v]) => v === '' || v === null || v !== v);
+    if (missing.length) {
+      resultEl.innerHTML = `<div class="error-msg">⚠️ Vui lòng điền đầy đủ tất cả các trường bắt buộc.</div>`;
+      return;
+    }
+
+    // Loading state
+    btn.disabled = true;
+    btn.innerHTML = `<div class="spinner"></div> Đang phân tích...`;
+    resultEl.innerHTML = '';
+
+    try {
+      const resp = await fetch('/api/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const res = await resp.json();
+
+      if (res.error) throw new Error(res.error);
+
+      renderResult(res);
+    } catch (err) {
+      resultEl.innerHTML = `<div class="error-msg">❌ Lỗi: ${err.message}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Phân tích hồ sơ`;
+    }
+  });
+
+  function renderResult(res) {
+    const el = document.getElementById('result');
+    const approved = res.approved;
+    const score = res.diem_tin_dung;
+    const limit = res.han_muc_toi_da;
+
+    // Score color
+    let scoreClass = 'score-low';
+    if (score >= 700) scoreClass = 'score-good';
+    else if (score >= 500) scoreClass = 'score-medium';
+    const scorePct = Math.min(100, Math.max(0, (score / 1000) * 100));
+
+    // Format money
+    const fmt = v => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v);
+
+    let metricsHtml = `
+      <div class="metric-box">
+        <div class="label">Điểm tín dụng</div>
+        <div class="value">${score.toFixed(0)}</div>
+        <div class="score-bar"><div class="score-fill ${scoreClass}" style="width:0%" data-pct="${scorePct}"></div></div>
+        <div class="sub">${score >= 700 ? 'Tốt ✓' : score >= 500 ? 'Trung bình' : 'Thấp'}</div>
+      </div>`;
+
+    if (approved && limit !== undefined) {
+      metricsHtml += `
+        <div class="metric-box">
+          <div class="label">Hạn mức tối đa</div>
+          <div class="value" style="font-size:1.25rem">${fmt(limit)}</div>
+          <div class="sub">Số tiền được cấp tối đa</div>
+        </div>`;
+    }
+
+    el.innerHTML = `
+      <div class="result-card ${approved ? 'approved' : 'rejected'}">
+        <div class="result-header">
+          <div class="result-badge ${approved ? 'ok' : 'no'}">${approved ? '✓' : '✕'}</div>
+          <div>
+            <h3>${approved ? 'Hồ sơ được xét duyệt' : 'Hồ sơ bị từ chối'}</h3>
+            <p>${approved
+              ? 'Khách hàng đủ điều kiện vay tín dụng theo tiêu chí đánh giá.'
+              : 'Hồ sơ chưa đáp ứng đủ điều kiện vay tín dụng hiện tại.'}</p>
+          </div>
+        </div>
+        <div class="metrics">${metricsHtml}</div>
+      </div>`;
+
+    // Animate score bar
+    requestAnimationFrame(() => {
+      const bar = el.querySelector('.score-fill');
+      if (bar) bar.style.width = bar.dataset.pct + '%';
+    });
+
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function resetForm() {
+    document.getElementById('creditForm').reset();
+    document.getElementById('result').innerHTML = '';
+  }
+</script>
+</body>
+</html>

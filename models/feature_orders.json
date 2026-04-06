@@ -1,0 +1,44 @@
+{
+  "trang_thai": [
+    "Tuổi",
+    "Tình trạng hôn nhân",
+    "Số người phụ thuộc",
+    "Thu nhập",
+    "Điểm CIC",
+    "Chi phí hàng tháng",
+    "Trình độ học vấn",
+    "Thời gian lao động",
+    "Vị trí công việc",
+    "Thời gian làm việc tại nơi LV hiện tại",
+    "Tình trạng nhà ở hiện tại",
+    "Hình thức nhận lương"
+  ],
+  "diem": [
+    "Tuổi",
+    "Tình trạng hôn nhân",
+    "Số người phụ thuộc",
+    "Thu nhập",
+    "Điểm CIC",
+    "Chi phí hàng tháng",
+    "Trình độ học vấn",
+    "Thời gian lao động",
+    "Vị trí công việc",
+    "Thời gian làm việc tại nơi LV hiện tại",
+    "Tình trạng nhà ở hiện tại",
+    "Hình thức nhận lương"
+  ],
+  "han_muc": [
+    "Tuổi",
+    "Tình trạng hôn nhân",
+    "Số người phụ thuộc",
+    "Thu nhập",
+    "Điểm CIC",
+    "Chi phí hàng tháng",
+    "Trình độ học vấn",
+    "Thời gian lao động",
+    "Vị trí công việc",
+    "Thời gian làm việc tại nơi LV hiện tại",
+    "Tình trạng nhà ở hiện tại",
+    "Hình thức nhận lương"
+  ]
+}
