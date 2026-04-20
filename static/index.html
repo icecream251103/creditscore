@@ -10,8 +10,8 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --primary: #1e3a5f;
-      --accent: #e63946;
+      --primary: #0054a6;
+      --accent: #f26f21;
       --success: #2dc87a;
       --warning: #f4a261;
       --danger: #e63946;
@@ -21,7 +21,7 @@
       --muted: #64748b;
       --border: #e2e8f0;
       --radius: 16px;
-      --shadow: 0 4px 24px rgba(30,58,95,0.08);
+      --shadow: 0 4px 24px rgba(0,0,0,0.08);
     }
 
     body {
@@ -33,7 +33,7 @@
 
     /* ── HEADER ── */
     header {
-      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+      background: linear-gradient(135deg, #0054a6 0%, #0077c8 100%);
       padding: 0 32px;
       display: flex;
       align-items: center;
@@ -42,15 +42,15 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 2px 16px rgba(30,58,95,0.25);
+      box-shadow: 0 2px 16px rgba(0,0,0,0.15);
     }
-    .logo-icon {
-      width: 40px; height: 40px;
+    .logo-img {
+      height: 48px;
+      object-fit: contain;
       background: #fff;
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px;
+      padding: 4px;
     }
-    .logo-icon svg { width: 24px; height: 24px; color: #1e3a5f; }
     header h1 { color: #fff; font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; }
     header span { color: rgba(255,255,255,0.65); font-size: 0.8rem; font-weight: 400; margin-left: 8px; }
 
@@ -111,8 +111,8 @@
     }
     .field input:focus,
     .field select:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0,84,166,0.15);
       background: #fff;
     }
     .field input.error,
@@ -126,7 +126,7 @@
     .btn-primary {
       height: 50px;
       padding: 0 36px;
-      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+      background: linear-gradient(135deg, #f26f21 0%, #d85c13 100%);
       color: #fff;
       border: none;
       border-radius: 12px;
@@ -233,11 +233,7 @@
 <body>
 
 <header>
-  <div class="logo-icon">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-    </svg>
-  </div>
+  <img src="/static/logo.png" alt="Logo" class="logo-img" />
   <h1>Hệ thống Chấm điểm Tín dụng<span>AI Credit Scoring</span></h1>
 </header>
 
@@ -295,8 +291,8 @@
         </div>
         <div class="field">
           <label>Điểm CIC <span class="req">*</span></label>
-          <input type="number" id="diemCIC" name="Điểm CIC" min="0" max="1000" placeholder="VD: 700" />
-          <span class="field-hint">0 – 1000 điểm</span>
+          <input type="number" id="diemCIC" name="Điểm CIC" min="150" max="850" placeholder="VD: 700" />
+          <span class="field-hint">150 – 850 điểm</span>
         </div>
         <div class="field">
           <label>Hình thức nhận lương <span class="req">*</span></label>
@@ -432,31 +428,52 @@
     const score = res.diem_tin_dung;
     const limit = res.han_muc_toi_da;
 
-    // Score color
-    let scoreClass = 'score-low';
-    if (score >= 700) scoreClass = 'score-good';
-    else if (score >= 500) scoreClass = 'score-medium';
-    const scorePct = Math.min(100, Math.max(0, (score / 1000) * 100));
+      // Score color & Grade
+      let scoreClass = 'score-low';
+      let scoreGrade = 'C';
 
-    // Format money
-    const fmt = v => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v);
+      if (score > 900) {
+        scoreClass = 'score-good';
+        scoreGrade = 'AA';
+      } else if (score >= 800) {
+        scoreClass = 'score-good';
+        scoreGrade = 'A';
+      } else if (score >= 700) {
+        scoreClass = 'score-good';
+        scoreGrade = 'BB';
+      } else if (score >= 600) {
+        scoreClass = 'score-medium';
+        scoreGrade = 'B';
+      } else if (score >= 500) {
+        scoreClass = 'score-medium';
+        scoreGrade = 'CC';
+      } else {
+        scoreClass = 'score-low';
+        scoreGrade = 'C';
+      }
 
-    let metricsHtml = `
-      <div class="metric-box">
-        <div class="label">Điểm tín dụng</div>
-        <div class="value">${score.toFixed(0)}</div>
-        <div class="score-bar"><div class="score-fill ${scoreClass}" style="width:0%" data-pct="${scorePct}"></div></div>
-        <div class="sub">${score >= 700 ? 'Tốt ✓' : score >= 500 ? 'Trung bình' : 'Thấp'}</div>
-      </div>`;
+      // Max score is 1000 for percentage calculation
+      const scorePct = Math.min(100, Math.max(0, (score / 1000) * 100));
 
-    if (approved && limit !== undefined) {
-      metricsHtml += `
+      // Format money
+      const fmt = v => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v);
+
+      let metricsHtml = `
         <div class="metric-box">
-          <div class="label">Hạn mức tối đa</div>
-          <div class="value" style="font-size:1.25rem">${fmt(limit)}</div>
-          <div class="sub">Số tiền được cấp tối đa</div>
+          <div class="label">Điểm tín dụng</div>
+          <div class="value">${score.toFixed(0)}</div>
+          <div class="score-bar"><div class="score-fill ${scoreClass}" style="width:0%" data-pct="${scorePct}"></div></div>
+          <div class="sub">Cấp độ: <strong>${scoreGrade}</strong></div>
         </div>`;
-    }
+
+      if (approved && limit !== undefined) {
+        metricsHtml += `
+          <div class="metric-box">
+            <div class="label">Hạn mức tối đa</div>
+            <div class="value" style="font-size:1.25rem">${fmt(limit)}</div>
+            <div class="sub">Số tiền được cấp tối đa</div>
+          </div>`;
+      }
 
     el.innerHTML = `
       <div class="result-card ${approved ? 'approved' : 'rejected'}">
